@@ -68,7 +68,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: "docker-compose.yml,prometheus.yml"
+#          source: "docker-compose.yml,prometheus.yml"
           target: "~/app/"  # 서버의 저장 경로
 
       # 서버에 배포
@@ -81,8 +81,8 @@ jobs:
           script: |
             cd ~/app
             
-            # Create .env file
-            printf "${{ secrets.ENV_FILE }}" > .env
+#            # Create .env file
+#            printf "${{ secrets.ENV_FILE }}" > .env
             
             # 1️⃣ 최신 Docker 이미지 풀
             docker compose pull
