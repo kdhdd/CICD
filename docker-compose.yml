@@ -1,73 +1,20 @@
-#services:
-#  mysql:
-#    image: mysql:latest
-#    environment:
-#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#      MYSQL_DATABASE: ${MYSQL_DATABASE}
-#      TZ: Asia/Seoul
-#    volumes:
-#      - ./mysql_data:/var/lib/mysql
-#    ports:
-#      - 3306:3306
-#    healthcheck:
-#      test: [ "CMD", "mysqladmin", "ping" ] # MySQL이 healthy 한 지 판단할 수 있는 명령어
-#      interval: 5s # 5초 간격으로 체크
-#      retries: 10 # 10번까지 재시도
-#
-#  redis:
-#    image: redis:latest
-#    ports:
-#      - 6379:6379
-#    healthcheck:
-#      test: [ "CMD", "redis-cli", "ping" ]
-#      interval: 5s
-#      retries: 10
-#
-#  graduate:
-#    env_file:
-#      - .env
-#    image: mark117/graduate:latest  # 이미지 이름을 명시적으로 설정
-#    ports:
-#      - 8080:8080
-#    environment:
-#      SPRING_PROFILES_ACTIVE: prod  # Spring 프로파일을 prod로 설정
-#    depends_on:
-#      mysql:
-#        condition: service_healthy
-#      redis:
-#        condition: service_healthy
-#
-#  dozzle:
-#    image: amir20/dozzle:latest
-#    container_name: dozzle
-#    ports:
-#      - "8081:8080"
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock  # 로그 접근을 위한 도커 소켓 마운트
-#    restart: unless-stopped
-#
-#  prometheus:
-#    image: prom/prometheus:latest
-#    container_name: prometheus
-#    ports:
-#      - "9090:9090"
-#    volumes:
-#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-#
-#  grafana:
-#    image: grafana/grafana
-#    container_name: grafana
-#    ports:
-#      - "3000:3000"
-#    volumes:
-#      - grafana-storage:/var/lib/grafana
-#
-#  node-exporter:
-#    image: prom/node-exporter
-#    container_name: node-exporter
-#    ports:
-#      - "9100:9100"
-#
-#volumes:
-#  mysql_data:
-#  grafana-storage:
+version: "3.9"
+
+services:
+  app:                       # 서비스 이름 (원하면 graduate로 유지해도 OK)
+    image: kdhdd/cicd:latest # ← 새 이미지
+    container_name: cicd     # 컨테이너 이름
+    ports:
+      - "8080:8080"          # 호스트:컨테이너
+    restart: unless-stopped  # 서버 재부팅 시 자동 재시작
+
+    # 필요하다면 환경변수만 최소한으로 남겨둡니다.
+    # environment:
+    #   SOME_KEY: some_value
+
+    # 헬스체크(선택)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
